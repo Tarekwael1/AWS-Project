@@ -6,14 +6,15 @@ import logging
 rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 username = "admin"  # Replace with your RDS username
 password = "Admin123"  # Replace with your RDS password
-db_name = "user_auth"
+db_name = "UserDatabase"
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO)
 
 def lambda_handler(event, context):
     logging.info("Connecting to the database...")
-    
+    connection = None  # <-- Define connection as None here
+
     try:
         # Connect to the database
         connection = pymysql.connect(
@@ -38,7 +39,7 @@ def lambda_handler(event, context):
         # SQL Query to check for matching credentials
         logging.info("Executing SQL query...")
         with connection.cursor() as cursor:
-            sql = "SELECT user_id, password_hash FROM users WHERE username=%s"
+            sql = "SELECT username, password FROM Users WHERE username=%s"
             cursor.execute(sql, (input_username,))
             logging.info("SQL query executed.")
             result = cursor.fetchone()
@@ -79,6 +80,6 @@ def lambda_handler(event, context):
         }
     finally:
         # Always close the connection to avoid leaks
-        if connection:
+        if connection is not None:  # <-- Only close if connection is assigned
             connection.close()
             logging.info("Connection closed.")
