@@ -8,23 +8,24 @@ logging.basicConfig(level=logging.INFO)
 DB_HOST = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 DB_USER = "admin"
 DB_PASSWORD = "Admin123"
-DB_NAME = "user_auth"
+DB_NAME = "UserDatabase"
 
-def lambda_handler(event, context):
+def lambda_handler(event, context): 
     try:
         # Parse input data
         logging.info("Parsing input data")
         body = json.loads(event['body'])
-        username = body['username']
-        gmail = body['gmail']
-        password = body['password']
-        unit_id = body['unit_id']
+
+        # Extract fields with default values or validation
+        username = body.get('username')
+        email = body.get('email')  # Use 'email' instead of 'gmail'
+        password = body.get('password')
 
         # Validate input (add more validations as needed)
-        if not username or not gmail or not password or not unit_id:
+        if not username or not email or not password:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'All fields are required'})
+                'body': json.dumps({'error': 'All fields (username, email, password) are required'})
             }
 
         # Connect to the RDS database
@@ -40,13 +41,13 @@ def lambda_handler(event, context):
         logging.info("Connected to the RDS database")
         cursor = conn.cursor()
 
-        # Insert data into the Users table without hashing the password
+        # Insert data into the Users table
         logging.info("Inserting data into the database")
         insert_query = """
-            INSERT INTO users (username, gmail, password_hash, unit_id)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO Users (username, password, email)
+            VALUES (%s, %s, %s)
         """
-        cursor.execute(insert_query, (username, gmail, password, unit_id))
+        cursor.execute(insert_query, (username, password, email))
         conn.commit()
 
         # Close the connection
@@ -60,11 +61,11 @@ def lambda_handler(event, context):
         }
 
     except pymysql.IntegrityError as e:
-        # Handle duplicate username or Gmail
+        # Handle duplicate username or email
         logging.error(f"Database error: {str(e)}")
         return {
             'statusCode': 400,
-            'body': json.dumps({'error': 'Username or Gmail already exists'})
+            'body': json.dumps({'error': 'Username or Email already exists'})
         }
 
     except Exception as e:
