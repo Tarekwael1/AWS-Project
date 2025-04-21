@@ -19,7 +19,7 @@ def lambda_handler(event, context):
         # Connect to the RDS database
         connection = pymysql.connect(
             host=rds_host,
-            user=username,
+            user=username, 
             password=password,
             database=db_name,
             cursorclass=pymysql.cursors.DictCursor
