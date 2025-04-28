@@ -10,43 +10,99 @@ Additionally, I will provide detailed documentation on the setup process, code s
 #2-Backend using AWS.
 #3- 4 to 5 models AI.
 #4- RL machine learning.
-
+----------------------------------------------------------------------------------------------------------------------------------
 #Looking especially at the backend of the mobile application, which AWS handles:
-#Generally speaking, I used AWS Lambda for serverless functions and API Gateway for managing API requests.RDS is used for relational database management, and S3 is used for storage of static files.  Additionally, I implemented IAM roles for secure access control and monitoring through CloudWatch to track performance and errors. EC2 to run the AI models. Furthermore, I will use AWS Glue for ETL (Extract, Transform, Load) processes, allowing for efficient data integration and preparation for the RL model. Finally, I will utilize CloudFormation for infrastructure as code, ensuring that my deployment is reproducible and manageable.
+#Generally speaking, I used AWS Lambda for serverless functions and API Gateway for managing API requests.RDS is used for relational database management, and S3 is used for the storage of static files.  Additionally, I implemented IAM roles for secure access control and monitoring through CloudWatch to track performance and errors. EC2 to run the AI models. Furthermore, I will use AWS Glue for ETL (Extract, Transform, Load) processes, allowing for efficient data integration and preparation for the RL model. Finally, I will utilize CloudFormation for infrastructure as code, ensuring that my deployment is reproducible and manageable.
 #So, let us start with the setup process for the AWS environment. (All of these steps were created after the project objectives were clearly defined and the AWS solution architect)
 #Note: The VPC is default created by AWS when you create your account and you will need to specify the VPC settings, including the subnet and security group configurations, to ensure proper connectivity and security for your database. So, if there are no VPCs in your account, create one because this is the environment where you will deploy your application and connect to the database.
 #1- Sign in to your AWS account(If you do not have one, create an account) and navigate to the AWS Management Console.
-#---> From this Link https://aws.amazon.com/
-#2-Create a user with the necessary permissions for your project.
-#---> Go to the upper left of the page and select "IAM" from the dropdown menu, or write IAM in the search console.
-#---> Select users from the left bar and click the "Add user" button to create a new user.
-#--->Name the user, then choose the policies and permissions that suit your project requirements, such as "AdministratorAccess" for full access or custom policies for specific permissions. And click on "Create user" to finalize the user creation process.
-#--->You now have a user's credentials that you can use to access AWS services.
-#3-Build Lambda functions.
-#3--->Select Lambda service from the search console and click on the "Create function" button to start building your first Lambda function.
-#--->Select the performances of your function and create it.
-#--->Go to the code and write your code in the inline editor, or upload a .zip file containing your function code and dependencies. You can also choose a runtime that suits your programming language, such as Python or Node.js.(In my project, I used Python)
-#--->Do these steps for all of your lambda functions.
-#4- Now we need to set up API Gateway to create endpoints for your Lambda functions, enabling them to be triggered via HTTP requests. And activate your mobile app.
-#---> Search API Gateway in the search console and select "Create API" to start configuring your API endpoints.
-#--->Choose your API type and create it.
-#--->From the left sidebar, select "Resources" to define your resources and methods for the API. You can then link each method to the corresponding Lambda function by selecting "Integration Type" as Lambda Function, and specifying the function you created earlier.
-#--->Once you have defined your resources and methods, deploy your API by selecting "Deploy API" from the Actions dropdown menu. Choose a deployment stage and click "Deploy" to make your API accessible.
-#5-After that, the project will not work, so why??
-#--->You create everything correctly, but you have not configured the necessary permissions and CORS settings for your API Gateway endpoints and Lambda functions to be invoked properly from your mobile app.
-#6-From Lambda function from configuration-> permissions-> add role if you do not added it when you was creating the function.
-#7-We created the Lambda functions and APIs, now we need to create the database which will store the data for our application using Amazon RDS. (If your database is relational)
-#--->Go to RDS in the AWS Management Console and select "Create database" to start the database creation process.
-#--->Choose your database's storage and CPU, ...etc.(I use the free tier version)
-#--->Prepare the permissions for your database by configuring the security groups and IAM roles to allow access from your Lambda functions and API Gateway. Ensure that the database is accessible only from the necessary sources to maintain security.
-#--->Security Groups are like a guard to the firewall for your AWS resources, controlling inbound and outbound traffic to your database instance. (The most problems occur due to misconfigured security group settings, which I faced.)
-#8-Create an EC2 instance to run your AI models and configure it with the necessary software and dependencies, such as Python, TensorFlow, or PyTorch, depending on the specific AI models you intend to run.
-#--->Go to EC2 in the AWS Management Console and select "Launch Instance" to start the instance creation process.
-#--->Pick out your EC2 type and configure the instance size, security group settings, and key pair for SSH access.
-#9-To create S3 bucket to store static files, go to S3 in the AWS Management Console.
-#--->Select "Create bucket". Choose a unique name for your bucket, configure the settings such as region and permissions, and click "Create bucket" to finalize the process.
-#--->If you need Lambda to access the S3 bucket, ensure that the appropriate permissions and policies are set for the Lambda function to interact with the bucket. And you should create an access point for easier management of access and permissions.
-#10- Finally, implement monitoring and logging for your AWS resources to track performance and troubleshoot any issues that arise. Use CloudWatch to set up alarms and dashboards for your Lambda functions, API Gateway, and RDS instances, ensuring that you can proactively manage your application.
+ #---> From this Link https://aws.amazon.com/
 
-#(This is overall about the steps and the AWS setup process and the architecture of my project, and the common problems that I encountered during the development phase.
-By following these steps, you can successfully set up your AWS environment and deploy your application while minimizing common pitfalls encountered during the process. The next step, I will upload all the code and configuration files to the repository for further reference and explain the steps of testing and the job of each Lambda and API endpoint, and so on.)
+#2-Create a user with the necessary permissions for your project.
+ #---> Go to the upper left of the page and select "IAM" from the dropdown menu, or write IAM in the search console.
+ #---> Select users from the left bar and click the "Add user" button to create a new user.
+ #--->Name the user, then choose the policies and permissions that suit your project requirements, such as "AdministratorAccess" for full access or custom policies for specific permissions. Click on "Create user" to finalize the user creation process.
+ #--->You now have a user's credentials that you can use to access AWS services.
+
+#3-Build Lambda functions.
+ #--->Select Lambda service from the search console and click on the "Create function" button to start building your first Lambda function.
+ #--->Select the performances of your function and create it.
+ #--->Go to the code and write your code in the inline editor, or upload a .zip file containing your function code and dependencies. You can also choose a runtime that suits your programming language, such as Python or Node.js.(In my project, I used Python)
+ #--->Do these steps for all of your lambda functions.
+
+#4- Now we need to set up API Gateway to create endpoints for your Lambda functions, enabling them to be triggered via HTTP requests. And activate your mobile app.
+ #---> Search API Gateway in the search console and select "Create API" to start configuring your API endpoints.
+ #--->Choose your API type and create it.
+ #--->From the left sidebar, select "Resources" to define your resources and methods for the API. You can then link each method to the corresponding Lambda function by selecting "Integration Type" as the Lambda Function and specifying the function you created earlier.
+ #--->Once you have defined your resources and methods, deploy your API by selecting "Deploy API" from the Actions dropdown menu. Choose a deployment stage and click "Deploy" to make your API accessible.
+
+#5-After that, the project will not work, so why??
+ #--->You create everything correctly, but you have not configured the necessary permissions and CORS settings for your API Gateway endpoints and Lambda functions to be invoked properly from your mobile app.
+
+#6-From Lambda function from configuration-> permissions-> add role if you did not add it when you were creating the function.
+
+#7-We created the Lambda functions and APIs, now we need to create the database that will store the data for our application using Amazon RDS. (If your database is relational)
+ #--->Go to RDS in the AWS Management Console and select "Create database" to start the database creation process.
+ #--->Choose your database's storage and CPU, ...etc.(I use the free tier version)
+ #--->Prepare the permissions for your database by configuring the security groups and IAM roles to allow access from your Lambda functions and API Gateway. Ensure that the database is accessible only from the necessary sources to maintain security.
+ #--->Security Groups are like a guard to the firewall for your AWS resources, controlling inbound and outbound traffic to your database instance. (Most problems occur due to misconfigured security group settings, which I faced.)
+
+#8-Create an EC2 instance to run your AI models and configure it with the necessary software and dependencies, such as Python, TensorFlow, or PyTorch, depending on the specific AI models you intend to run.
+ #--->Go to EC2 in the AWS Management Console and select "Launch Instance" to start the instance creation process.
+ #--->Pick out your EC2 type and configure the instance size, security group settings, and key pair for SSH access.
+
+#9-To create S3 bucket to store static files, go to S3 in the AWS Management Console.
+ #--->Select "Create bucket". Choose a unique name for your bucket, configure the settings such as region and permissions, and click "Create bucket" to finalize the process.
+ #--->If you need Lambda to access the S3 bucket, ensure that the appropriate permissions and policies are set for the Lambda function to interact with the bucket. And you should create an access point for easier management of access and permissions.
+
+#10- Finally, implement monitoring and logging for your AWS resources to track performance and troubleshoot any issues that arise. Use CloudWatch to set up alarms and dashboards for your Lambda functions, API Gateway, and RDS instances, ensuring that you can proactively manage your application.
+----------------------------------------------------------------------------------------------------------------------------------
+
+#I created a small test for the AWS Glue with filtered data received from Raspberry Pi.
+ #--->RL_Data_Filter.py is the script for Lambda function, which choose the required data for the RL model such as(PH, Rh, Light...etc). This function filter data and then save it as file.CSV into S3 bucket as a source file for the ETL. The ETL continue filteration like if the RL need the value for example the PH is equal 20 and RH 3 the output will be another file.CSV which will been saved into another folder in the S3 bucket.
+#Steps:
+1-Create the S3 bucket and create a folder.
+
+2-Create a Lambda function with its requirements.
+ #--->IAM:
+ ===>AWSLambdaBasicExecutionRole
+ ===>S3FullAccess
+ #Liberaies:
+ ===>Pymysql
+
+3-Go to AWS Glue.
+ #--->Create a new crawler.
+ ===>Choose your source file which is the output of the lambda function in the S3 and make the format CSV.
+ ===>Choose the database of Glue, if you do not have one, create a new one.
+ ===>Name the crawler and save.
+ ===>Run the crawler. (This will create a table. If you need to check if the table was created successfully go to the table on the left and check).
+ #--->Go to ETL Jobs.
+ ===>If you need to create it as a code or as a visual. (I created it using a visual ETL).
+ ===>From (+) choose source --> S3 bucket double click on it and select the path to your CSV file from S3 bucket.
+ ===>From (+) choose transform -->Custom transform.
+ ===> From (+) choose target and select the output path to S3. (It should be another folder).
+ #--->Name the Job, save, and Run it.
+
+In the future, I will make the cloudwatchlogs to run this operation like the project's requirements.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#(This is overall about the steps of the AWS setup process the architecture of my project, and the common problems that I encountered during the development phase.
+By following these steps, you can successfully set up your AWS environment and deploy your application while minimizing common pitfalls encountered during the process. In the next step, I will upload all the code and configuration files to the repository for further reference and explain the steps of testing and the job of each Lambda and API endpoint, and so on.)
