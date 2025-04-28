@@ -85,6 +85,8 @@ Additionally, I will provide detailed documentation on the setup process, code s
 
 In the future, I will make the cloudwatchlogs to run this operation like the project's requirements.
 
+----------------------------------------------------------------------------------------------------------------------------------
+#(Here I will explain all the scripts and their goals).
 
 
 
@@ -101,8 +103,6 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 
 
 
-
-
-
+----------------------------------------------------------------------------------------------------------------------------------
 #(This is overall about the steps of the AWS setup process the architecture of my project, and the common problems that I encountered during the development phase.
 By following these steps, you can successfully set up your AWS environment and deploy your application while minimizing common pitfalls encountered during the process. In the next step, I will upload all the code and configuration files to the repository for further reference and explain the steps of testing and the job of each Lambda and API endpoint, and so on.)
