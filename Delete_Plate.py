@@ -10,7 +10,7 @@ logger.setLevel(logging.INFO)
 rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 username = "admin"
 password = "Admin123"
-db_name = "USER1_db"
+db_name = "main_db"
 
 def lambda_handler(event, context):
     try:

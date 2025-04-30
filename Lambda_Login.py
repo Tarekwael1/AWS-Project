@@ -6,7 +6,7 @@ import logging
 rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 username = "admin"  # Replace with your RDS username
 password = "Admin123"  # Replace with your RDS password
-db_name = "UserDatabase"
+db_name = "main_db"
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO)
@@ -39,21 +39,21 @@ def lambda_handler(event, context):
         # SQL Query to check for matching credentials
         logging.info("Executing SQL query...")
         with connection.cursor() as cursor:
-            sql = "SELECT username, password FROM Users WHERE username=%s"
+            sql = "SELECT username, password_hash FROM Users WHERE username=%s"
             cursor.execute(sql, (input_username,))
             logging.info("SQL query executed.")
             result = cursor.fetchone()
             
             if result:
-                stored_user_id = result[0]
+                stored_username = result[0]
                 stored_password_hash = result[1]
                 
                 # Assuming you are comparing plain text passwords
-                # Use a hashing comparison in a real-world scenario
-                if stored_password_hash == input_password:  # Adjust this to hashed password logic
+                # In production, use hashed password comparison (e.g., bcrypt)
+                if stored_password_hash == input_password:
                     return {
                         'statusCode': 200,
-                        'body': json.dumps({'user_id': str(stored_user_id)})
+                        'body': json.dumps({'username': stored_username})
                     }
                 else:
                     return {

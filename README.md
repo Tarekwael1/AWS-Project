@@ -89,7 +89,7 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 #(Here I will explain all the scripts and their goals).
 
 
-
+***There is no Lambda for Disease detection model***
 
 
 

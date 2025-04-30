@@ -10,7 +10,7 @@ logger.setLevel(logging.INFO)
 rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 username = "admin"
 password = "Admin123"
-db_name = "USER1_db"
+db_name = "main_db"
 
 def lambda_handler(event, context):
     connection = None
@@ -45,53 +45,39 @@ def lambda_handler(event, context):
             plates = cursor.fetchall()
             logger.info("Plates query result: %s", plates)
 
-        # Initialize response with default values
-        plates_response = {
-            "plate1": {
-                "plate_id": "empty",
-                "plate_name": "empty",
-                "plant_name": "empty",
-                "harvested": "empty"
-            },
-            "plate2": {
-                "plate_id": "empty",
-                "plate_name": "empty",
-                "plant_name": "empty",
-                "harvested": "empty"
-            }
-        }
+        # Dynamically build response for all plates
+        plates_response = {}
 
-        # Update response with data from the database
         for plate in plates:
             plate_id = plate["plate_id"]
-            if plate_id in [1, 2]:  # Only process plates 1 and 2
-                # Query to fetch the plant name and harvested status for the current plate
-                plant_query = """
-                SELECT 
-                    plant_name,
-                    harvested
-                FROM 
-                    Plants
-                WHERE 
-                    plate_id = %s and harvested = 0;
-                """
-                with connection.cursor() as cursor:
-                    logger.info("Executing plant query for plate_id %s", plate_id)
-                    cursor.execute(plant_query, (plate_id,))
-                    plant = cursor.fetchone()  # Fetch only one plant
-                    logger.info("Plant query result for plate_id %s: %s", plate_id, plant)
 
-                # Extract the plant name and harvested status (or set to "empty" if no plant is found)
-                plant_name = plant["plant_name"] if plant and plant["plant_name"] else "empty"
-                harvested = plant["harvested"] if plant and "harvested" in plant else "empty"
+            # Query to fetch the plant name and harvested status for the current plate
+            plant_query = """
+            SELECT 
+                plant_name,
+                harvested
+            FROM 
+                Plants
+            WHERE 
+                plate_id = %s AND harvested = 0;
+            """
+            with connection.cursor() as cursor:
+                logger.info("Executing plant query for plate_id %s", plate_id)
+                cursor.execute(plant_query, (plate_id,))
+                plant = cursor.fetchone()
+                logger.info("Plant query result for plate_id %s: %s", plate_id, plant)
 
-                # Update the response for the plate
-                plates_response[f"plate{plate_id}"] = {
-                    "plate_id": plate_id if plate_id else "empty",
-                    "plate_name": plate["plate_name"] if plate["plate_name"] else "empty",
-                    "plant_name": plant_name,
-                    "harvested": harvested
-                }
+            # Prepare plant data
+            plant_name = plant["plant_name"] if plant and plant.get("plant_name") else "empty"
+            harvested = plant["harvested"] if plant and "harvested" in plant else "empty"
+
+            # Dynamically name the key: e.g., "plate1", "plate2", etc.
+            plates_response[f"plate{plate_id}"] = {
+                "plate_id": plate_id,
+                "plate_name": plate.get("plate_name", "empty"),
+                "plant_name": plant_name,
+                "harvested": harvested
+            }
 
         # Return the response
         response = {
