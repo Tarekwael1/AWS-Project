@@ -9,7 +9,7 @@ logger.setLevel(logging.INFO)
 rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 username = "admin"
 password = "Admin123"
-db_name = "USER1_db"
+db_name = "main_db"
 
 def lambda_handler(event, context):
     try:
@@ -47,8 +47,8 @@ def lambda_handler(event, context):
         with connection.cursor() as cursor:
             # Step 1: Check if the plant already exists in the Plants table
             cursor.execute(
-                "SELECT * FROM Plants WHERE plant_id = %s AND age_in_weeks = %s;",
-                (plant_id, age_in_weeks)
+                "SELECT * FROM Plants WHERE plant_id = %s;",
+                (plant_id,)
             )
             plant = cursor.fetchone()
 
@@ -57,12 +57,12 @@ def lambda_handler(event, context):
                 cursor.execute(
                     """
                     UPDATE Plants
-                    SET plant_name = %s, plate_id = %s, harvested = %s
-                    WHERE plant_id = %s AND age_in_weeks = %s;
+                    SET plant_name = %s, plate_id = %s, age_in_weeks = %s, harvested = %s
+                    WHERE plant_id = %s;
                     """,
-                    (plant_name, plate_id, harvested, plant_id, age_in_weeks)
+                    (plant_name, plate_id, age_in_weeks, harvested, plant_id)
                 )
-                connection.commit()  # Commit the update
+                connection.commit()
                 logger.info("Updated plant_id %s with plant_name '%s' in plate %s.", plant_id, plant_name, plate_id)
             else:
                 # Step 3: Insert the plant data if it doesn't exist
