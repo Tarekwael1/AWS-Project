@@ -48,7 +48,7 @@ def lambda_handler(event, context):
         with connection.cursor() as cursor:
             # SQL query to insert unit data based on the user_id
             query = """INSERT INTO units (user_id, unit_name, description, user_image_url, unit_image_url)
-                       VALUES (%s, %s, %s, %s, %s)"""
+                    VALUES (%s, %s, %s, %s, %s)"""
             
             # Execute the query with the provided data
             cursor.execute(query, (user_id, unit_name, description, user_image_url, unit_image_url))
