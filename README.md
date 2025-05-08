@@ -87,21 +87,135 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 
 ----------------------------------------------------------------------------------------------------------------------------------
 #(Here I will explain all the scripts and their goals).
+#Lambda_Login.py
+    --->This Lambda is for Login and its name in the AWS is rds-user-auth, it is used to authenticate the user and then to get the user's data from the database.
+
+#Lambda_Registeration.py
+    --->This Lambda is for registering a new user and saving his data into the database.
+
+#Dashboard_start.py
+    --->This Lambda is for returning all the plates' data from the database and sending it to the APP via API Gateway to display them.
+
+#Setup_plate.py
+     --->This Lambda is for setting up a new plate and saving it in the database, which receives the data from the app via API Gateway.
+
+#Delete_Plate.py
+    --->This Lambda is for deleting a plate from the database, and also receiving the data from the APP via API Gateway.
+
+#ControlACT.py
+    --->***----This will be created soon----***
+
+#GetACTStatus.py
+    --->***____This will be created soon____***
+
+#Get_disease_image.py
+    --->This Lambda is for getting the disease image from the database and S3 and sending it to the APP via API Gateway.
+
+#Delete_disease_image.py
+    --->This Lambda is for deleting the diseases' images for S3 and RDS, which receives the data from the APP via API Gateway.
+
+#Lambda _New_Unit.py
+    --->***____This will be created soon____***
+
+#Lambda_Unit_Page.py
+    --->***___This will be created soon___***
+
+#RL_Data_Filter.py
+    --->This Lambad gets the data from the database and saves the required data into the S3 bucket to be the source for the ETL job.
+
+#RPI_Data,py
+    --->This Lambda is for receiving the data from the RPI's sensors
+
+#start_stop_EC2.py
+    --->This Lambda is for starting and stopping the EC2 instance, which runs the models.
+
+***There is no Lambda for Disease detection model(This will be created soon)***
+
+#EC2_Disease_Detiction.py
+    --->This is the script, which runs the disease detection model on the EC2 instance, and save the result in the database.
+
+#EC2_Prediction.py
+    --->This is the script, which runs the prediction model on the EC2 instance, and save the result is the database.
+
+----------------------------------------------------------------------------------------------------------------------------------
+#APIs
+#rds-user-auth --->  https://zeucnmkeah.execute-api.us-east-1.amazonaws.com/RegisterLogin/rds-user-auth .
+    -Postman JSON--->{
+        "username": "NAME",
+        "password": "Password"
+        }
+
+#RegisterUserFunction ---> https://zeucnmkeah.execute-api.us-east-1.amazonaws.com/RegisterLogin/RegisterUserFunction .
+    -Postman JSON--->{
+                    "username": "Name"
+                    "password": "Password"
+                    "email": "E-mail"
+                    }
+
+#Dashboard_Start ---> https://jk50f5a0mi.execute-api.us-east-1.amazonaws.com/Dashboard/Dashboard_Start .
+    -Postman JSON--->{It requiers nothing}
+
+#Setup_Plate ---> https://gisvleb85c.execute-api.us-east-1.amazonaws.com/Setup_Delete_plate/setup-plate .
+    -Postman JSON--->{
+                    "plate_id": 1,
+                    "plant_name": "Lavender",
+                    "plant_id": 1,
+                    "age_in_weeks": 3,
+                    "harvested": false
+                    }
+
+#Delete_Plate ---> https://gisvleb85c.execute-api.us-east-1.amazonaws.com/Setup_Delete_plate/delete-plate .
+    -Postman JSON--->{
+                     "plate_name" :"Plate_1A"
+                    }
+
+#Unit_page ---> https://jfgzrm1xoe.execute-api.us-east-1.amazonaws.com/Unit-page/Unit-page .
+    -Postman JSON--->***___This will be created soon___***
+
+#New_Unit ---> https://jfgzrm1xoe.execute-api.us-east-1.amazonaws.com/Unit-page/New-Unit .
+    -Postman JSON--->***___This will be created soon___***
+
+#RPI_Data ---> https://wdy1m5yd7i.execute-api.us-east-1.amazonaws.com/RPI/RPI_DATA .
+    -Postman JSON--->{
+                    "plate_id": 1,
+                    "plant_id": 2,
+                    "user_id": 2,
+                    "unit_id": 1,
+                    "timestamp": "2025-04-30 14:30:00",
+                    "temperature": 25.5,
+                    "humidity": 60.2,
+                    "light_intensity": 350.0,
+                    "solution_level": 5.5,
+                    "ph": 6.5,
+                    "ec": 1.2,
+                    "anomly_detection": 0,
+                    "red_light_intensity": 100.0,
+                    "blue_light_intensity": 80.0,
+                    "far_red_light_intensity": 60.0,
+                    "air_flow_level": 2.0,
+                    "CO2": 400.0
+                    }
 
 
-***There is no Lambda for Disease detection model***
+#RL_Filter --->***___This will be created soon_____***
+    -Postman JSON--->***___This will be created soon___***
 
+#Get-desease-image ---> https://a4b272sa24.execute-api.us-east-1.amazonaws.com/disease_images/Get-disease-image .
+    -Postman JSON--->{It requiers nothing}
 
+#Delete-desease-image ---> https://a4b272sa24.execute-api.us-east-1.amazonaws.com/disease_images/Delete-disease-image .
+    -Postman JSON--->{
+                    "image_url": "https://prediction-resultss.s3.amazonaws.com/predictions/botrytis_predicted_1738860975.jpg "
+                    }
 
+#GetACTStatus ---> ***_____This will be created soon______***
+    -Postman JSON--->***___This will be created soon___***
 
+#ControlACT ---> ***_____This will be created soon______***
+    -Postman JSON--->***___This will be created soon___***
 
-
-
-
-
-
-
-
+#start-stop-EC2 ---> https://jk50f5a0mi.execute-api.us-east-1.amazonaws.com/Dashboard/Get-prediction .
+    -Postman JSON--->{It requiers nothing}
 
 ----------------------------------------------------------------------------------------------------------------------------------
 #(This is overall about the steps of the AWS setup process the architecture of my project, and the common problems that I encountered during the development phase.
