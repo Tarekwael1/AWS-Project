@@ -114,12 +114,6 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 #Delete_disease_image.py
     --->This Lambda is for deleting the diseases' images for S3 and RDS, which receives the data from the APP via API Gateway.
 
-#Lambda _New_Unit.py
-    --->***____This will be created soon____***
-
-#Lambda_Unit_Page.py
-    --->***___This will be created soon___***
-
 #RL_Data_Filter.py
     --->This Lambad gets the data from the database and saves the required data into the S3 bucket to be the source for the ETL job.
 
@@ -157,7 +151,8 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 
 #Setup_Plate ---> https://gisvleb85c.execute-api.us-east-1.amazonaws.com/Setup_Delete_plate/setup-plate .
     -Postman JSON--->{
-                    "plate_id": 1,
+                    "user_id" : "2",
+                    "plate_id": 2,
                     "plant_name": "Lavender",
                     "plant_id": 1,
                     "age_in_weeks": 3,
@@ -166,14 +161,10 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 
 #Delete_Plate ---> https://gisvleb85c.execute-api.us-east-1.amazonaws.com/Setup_Delete_plate/delete-plate .
     -Postman JSON--->{
-                     "plate_name" :"Plate_1A"
+                    "plate_name": "Plate 1",
+                    "user_id": "1"
                     }
 
-#Unit_page ---> https://jfgzrm1xoe.execute-api.us-east-1.amazonaws.com/Unit-page/Unit-page .
-    -Postman JSON--->***___This will be created soon___***
-
-#New_Unit ---> https://jfgzrm1xoe.execute-api.us-east-1.amazonaws.com/Unit-page/New-Unit .
-    -Postman JSON--->***___This will be created soon___***
 
 #RPI_Data ---> https://wdy1m5yd7i.execute-api.us-east-1.amazonaws.com/RPI/RPI_DATA .
     -Postman JSON--->{
@@ -198,7 +189,10 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 
 
 #RL_Filter --->***___This will be created soon_____***
-    -Postman JSON--->***___This will be created soon___***
+    -Postman JSON--->{
+                    "user_id": "12345"
+                    }
+
 
 #Get-desease-image ---> https://a4b272sa24.execute-api.us-east-1.amazonaws.com/disease_images/Get-disease-image .
     -Postman JSON--->{It requiers nothing}

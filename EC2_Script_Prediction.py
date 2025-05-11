@@ -13,7 +13,7 @@ logger = logging.getLogger()
 rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 rds_user = "admin"
 rds_password = "Admin123"
-rds_database = "USER1_db"
+rds_database = "main_db"
 
 # Load the saved model
 with open('/home/ubuntu/knn_model.pkl', 'rb') as model_file:

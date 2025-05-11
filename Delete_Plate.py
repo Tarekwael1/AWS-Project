@@ -17,11 +17,12 @@ def lambda_handler(event, context):
         # Parse the request body
         body = json.loads(event.get("body", "{}"))
         plate_name = body.get("plate_name")  # Example: "Plate 1" or "Plate 2"
+        user_id = body.get("user_id")  # Example: "123" (string)
 
-        if not plate_name:
-            raise ValueError("'plate_name' is required.")
+        if not plate_name or not user_id:
+            raise ValueError("'plate_name' and 'user_id' are required.")
 
-        logger.info("Received request to update harvest status for plate %s", plate_name)
+        logger.info("Received request to update harvest status for plate %s for user %s", plate_name, user_id)
 
         # Connect to the RDS database
         connection = pymysql.connect(
@@ -37,15 +38,15 @@ def lambda_handler(event, context):
         plate_query = """
         SELECT plate_id
         FROM Plates
-        WHERE plate_name = %s;
+        WHERE plate_name = %s AND user_id = %s;
         """
         with connection.cursor() as cursor:
-            cursor.execute(plate_query, (plate_name,))
+            cursor.execute(plate_query, (plate_name, user_id))
             plate = cursor.fetchone()
             if not plate:
-                raise ValueError(f"Plate with name '{plate_name}' not found.")
+                raise ValueError(f"Plate with name '{plate_name}' not found for user_id '{user_id}'.")
             plate_id = plate["plate_id"]
-            logger.info("Found plate_id %s for plate_name %s.", plate_id, plate_name)
+            logger.info("Found plate_id %s for plate_name %s and user_id %s.", plate_id, plate_name, user_id)
 
         # Step 2: Update the Plants table to mark plants on this plate as harvested
         update_query = """
