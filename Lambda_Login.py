@@ -39,21 +39,21 @@ def lambda_handler(event, context):
         # SQL Query to check for matching credentials
         logging.info("Executing SQL query...")
         with connection.cursor() as cursor:
-            sql = "SELECT username, password_hash FROM Users WHERE username=%s"
+            sql = "SELECT username, user_id, password_hash FROM Users WHERE username=%s"
             cursor.execute(sql, (input_username,))
             logging.info("SQL query executed.")
             result = cursor.fetchone()
             
             if result:
-                stored_username = result[0]
-                stored_password_hash = result[1]
+                stored_user_id = str(result[1])
+                stored_password_hash = result[2]
                 
                 # Assuming you are comparing plain text passwords
                 # In production, use hashed password comparison (e.g., bcrypt)
                 if stored_password_hash == input_password:
                     return {
                         'statusCode': 200,
-                        'body': json.dumps({'username': stored_username})
+                        'body': json.dumps({'user_id': stored_user_id})
                     }
                 else:
                     return {

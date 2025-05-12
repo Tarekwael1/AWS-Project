@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# RDS Configuration (hardcoded credentials)
+# RDS Configuration
 rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
 username = "admin"
 password = "Admin123"
@@ -15,18 +15,37 @@ db_name = "main_db"
 def lambda_handler(event, context):
     connection = None
     try:
-        logger.info("Connecting to the database...")
-        # Connect to the RDS database
+        logger.info("Received event: %s", json.dumps(event))
+
+        # Parse user_id from the incoming request body
+        if 'body' in event:
+            body = json.loads(event['body'])
+            user_id = body.get('user_id')
+        else:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({"error": "Missing request body."})
+            }
+
+        if not user_id:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({"error": "Missing user_id in request."})
+            }
+
+        logger.info(f"Received user_id: {user_id}")
+
+        # Connect to the database
         connection = pymysql.connect(
             host=rds_host,
-            user=username, 
+            user=username,
             password=password,
             database=db_name,
             cursorclass=pymysql.cursors.DictCursor
         )
         logger.info("Database connection established.")
 
-        # Query to fetch plates
+        # Query to fetch plates associated with the user
         plates_query = """
         SELECT 
             plate_id,
@@ -35,21 +54,24 @@ def lambda_handler(event, context):
             planting_method_id
         FROM 
             Plates
+        WHERE 
+            user_id = %s
         ORDER BY 
             plate_id ASC;
         """
 
         with connection.cursor() as cursor:
-            logger.info("Executing plates query: %s", plates_query)
-            cursor.execute(plates_query)
+            logger.info("Executing plates query for user_id %s", user_id)
+            cursor.execute(plates_query, (user_id,))
             plates = cursor.fetchall()
             logger.info("Plates query result: %s", plates)
 
-        # Dynamically build response for all plates
         plates_response = {}
+        plate_count = 0
 
         for plate in plates:
             plate_id = plate["plate_id"]
+            plate_count += 1
 
             # Query to fetch the plant name and harvested status for the current plate
             plant_query = """
@@ -59,48 +81,50 @@ def lambda_handler(event, context):
             FROM 
                 Plants
             WHERE 
-                plate_id = %s AND harvested = 0;
+                plate_id = %s AND harvested = 0 AND user_id = %s;
             """
             with connection.cursor() as cursor:
                 logger.info("Executing plant query for plate_id %s", plate_id)
-                cursor.execute(plant_query, (plate_id,))
+                cursor.execute(plant_query, (plate_id, user_id))
                 plant = cursor.fetchone()
-                logger.info("Plant query result for plate_id %s: %s", plate_id, plant)
+                logger.info("Plant query result: %s", plant)
 
-            # Prepare plant data
             plant_name = plant["plant_name"] if plant and plant.get("plant_name") else "empty"
             harvested = plant["harvested"] if plant and "harvested" in plant else "empty"
 
-            # Dynamically name the key: e.g., "plate1", "plate2", etc.
             plates_response[f"plate{plate_id}"] = {
                 "plate_id": plate_id,
                 "plate_name": plate.get("plate_name", "empty"),
+                "unit_id": plate.get("unit_id", "empty"),
+                "planting_method_id": plate.get("planting_method_id", "empty"),
                 "plant_name": plant_name,
                 "harvested": harvested
             }
 
-        # Return the response
-        response = {
+        result = {
+            "user_id": user_id,
+            "number_of_plates": plate_count,
+            "plates": plates_response
+        }
+
+        return {
             "statusCode": 200,
-            "body": json.dumps(plates_response, default=str)  # Serialize response
+            "body": json.dumps(result, default=str)
         }
 
     except pymysql.MySQLError as e:
         logger.error("MySQL error: %s", e)
-        response = {
+        return {
             "statusCode": 500,
             "body": json.dumps({"error": "Database connection failed", "details": str(e)})
         }
     except Exception as e:
         logger.error("Unexpected error: %s", e)
-        response = {
+        return {
             "statusCode": 500,
             "body": json.dumps({"error": "Internal server error", "details": str(e)})
         }
     finally:
-        # Ensure the database connection is closed
         if connection:
             connection.close()
             logger.info("Database connection closed.")
-
-    return response

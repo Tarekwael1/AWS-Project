@@ -20,7 +20,7 @@ db_config = {
 # S3 bucket details
 s3_bucket = "prediction-resultss"  # Replace with your S3 bucket name
 
-def delete_image_data(image_url):
+def delete_image_data(image_url, user_id):
     connection = None
     cursor = None
     try:
@@ -32,16 +32,18 @@ def delete_image_data(image_url):
         # Handle different S3 URL formats:
         # Format 1: https://s3.amazonaws.com/bucket-name/path/to/object
         # Format 2: https://bucket-name.s3.amazonaws.com/path/to/object
-        if f"s3.amazonaws.com/{s3_bucket}/" in image_url:
-            object_key = image_url.split(f"s3.amazonaws.com/{s3_bucket}/")[-1]
-        elif f"{s3_bucket}.s3.amazonaws.com/" in image_url:
-            object_key = image_url.split(f"{s3_bucket}.s3.amazonaws.com/")[-1]
+        import re
+
+        match = re.search(rf"{s3_bucket}\.s3[\.-][a-z0-9-]+\.amazonaws\.com/(.+)", image_url)
+        if match:
+            object_key = match.group(1)
         else:
             logger.error(f"Unsupported S3 URL format: {image_url}")
             return {
                 'status': 'error',
                 'message': f"Unsupported S3 URL format: {image_url}"
             }
+
 
         logger.info(f"Deleting S3 object with key: {object_key}")
 
@@ -53,20 +55,20 @@ def delete_image_data(image_url):
             logger.error(f"Error deleting object from S3: {e}")
             raise
 
-        # Step 2: Delete the record from RDS
+        # Step 2: Delete the record from RDS (and ensure it matches the user_id)
         connection = pymysql.connect(**db_config)
         cursor = connection.cursor()
         logger.info("Connected to the database")
 
-        delete_query = "DELETE FROM Disease_Detection_Results WHERE s3_url = %s"
-        logger.info(f"Executing query: {delete_query} with s3_url: {image_url}")
-        cursor.execute(delete_query, (image_url,))
+        delete_query = "DELETE FROM Disease_Detection_Results WHERE disease_uri = %s AND user_id = %s"
+        logger.info(f"Executing query: {delete_query} with disease_uri: {image_url} and user_id: {user_id}")
+        cursor.execute(delete_query, (image_url, user_id))
         connection.commit()
         logger.info(f"Deleted {cursor.rowcount} record(s) from RDS")
 
         return {
             'status': 'success',
-            'message': f"Deleted image {image_url} from S3 and RDS"
+            'message': f"Deleted image {image_url} from S3 and RDS for user {user_id}"
         }
 
     except DBError as e:
@@ -97,9 +99,10 @@ def delete_image_data(image_url):
 
 def lambda_handler(event, context):
     try:
-        # Parse the image URL from the API event
+        # Parse the image URL and user_id from the API event
         body = json.loads(event['body'])
         image_url = body.get('image_url')
+        user_id = body.get('user_id')
         
         # Validate input
         if not image_url:
@@ -108,11 +111,18 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'body': json.dumps({"error": "image_url is required"})
             }
+        
+        if not user_id:
+            logger.error("user_id is missing or empty")
+            return {
+                'statusCode': 400,
+                'body': json.dumps({"error": "user_id is required"})
+            }
 
-        logger.info(f"Received request to delete image: {image_url}")
+        logger.info(f"Received request to delete image: {image_url} for user: {user_id}")
 
         # Call the function to delete the image
-        result = delete_image_data(image_url)
+        result = delete_image_data(image_url, user_id)
 
         # Return the response
         return {

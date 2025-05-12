@@ -1,6 +1,3 @@
-#This script will start the EC2 incstance if it is stopped and run the script (prediction_code.py) on the EC2 instance using SSM.
-#This model predicts the plant type based on the input image and stores the result in an RDS database.
-# Lambda function to start EC2 instance, run a script, and fetch results from RDS.
 import boto3
 import json
 import time
@@ -19,11 +16,20 @@ ssm_client = boto3.client('ssm', region_name=region)
 rds_host = 'yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com'  # Replace with your RDS endpoint
 rds_user = 'admin'  # Replace with your RDS username
 rds_password = 'Admin123'  # Replace with your RDS password
-rds_database = 'USER1_db'  # Replace with your RDS database name
+rds_database = 'main_db'  # Updated database name
 
 def lambda_handler(event, context):
     try:
         print("Starting Lambda execution...")
+
+        # Parse the body field to get user_id
+        body = json.loads(event.get('body', '{}'))  # Safely load body as JSON
+        user_id = str(body.get('user_id', None))
+        if not user_id:
+            print("Error: 'user_id' is missing from the event body.")
+            raise ValueError("user_id not provided in the event body.")
+
+        print(f"Received user_id: {user_id}")
 
         # Start EC2 Instance (if not already running)
         print("Checking EC2 instance status...")
@@ -38,8 +44,8 @@ def lambda_handler(event, context):
         else:
             print("EC2 instance is already running.")
 
-        # Command to run the script on EC2
-        command = "sudo -u ubuntu /usr/bin/python3 /home/ubuntu/prediction_code.py"
+        # Command to run the script on EC2 with user_id
+        command = f"sudo -u ubuntu /usr/bin/python3 /home/ubuntu/prediction_code.py {user_id}"
         print("Command to execute on EC2:", command)
 
         # Send command to EC2 instance via SSM
@@ -88,16 +94,16 @@ def lambda_handler(event, context):
             )
             cursor = connection.cursor()
 
-            # Query the latest result from the database
-            query = "SELECT predicted_Plant FROM predictions WHERE 1"
-            cursor.execute(query)
+            # Updated query to fetch prediction_output for user_id from predicions table
+            query = "SELECT prediction_output FROM predicions WHERE user_id = %s LIMIT 1"
+            cursor.execute(query, (user_id,))
             result = cursor.fetchone()
 
             if result:
                 prediction_result = result[0]
                 print(f"Prediction result from RDS: {prediction_result}")
             else:
-                prediction_result = "No result found in the database."
+                prediction_result = "No result found for this user_id."
                 print(prediction_result)
 
             # Close the database connection
@@ -108,7 +114,7 @@ def lambda_handler(event, context):
             print(f"Error fetching result from RDS: {e}")
             return {
                 'statusCode': 500,
-                'body': json.dumps({'error': str(e)})
+                'body': json.dumps({'error': str(e)}),
             }
 
         # Return the result to the API

@@ -56,9 +56,9 @@ def lambda_handler(event, context):
         # 4. Check for existing username or email
         check_sql = """
             SELECT user_id, username, email
-            FROM Users
-            WHERE username = %s OR email = %s
-            LIMIT 1
+              FROM Users
+             WHERE username = %s OR email = %s
+             LIMIT 1
         """
         logger.info(f"Running existence check: {check_sql} with [{username}, {email}]")
         cursor.execute(check_sql, (username, email))

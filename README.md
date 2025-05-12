@@ -135,15 +135,15 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 #APIs
 #rds-user-auth --->  https://zeucnmkeah.execute-api.us-east-1.amazonaws.com/RegisterLogin/rds-user-auth .
     -Postman JSON--->{
-        "username": "NAME",
-        "password": "Password"
-        }
+                        "username": "NAME",
+                        "password": "Password"
+                    }
 
 #RegisterUserFunction ---> https://zeucnmkeah.execute-api.us-east-1.amazonaws.com/RegisterLogin/RegisterUserFunction .
     -Postman JSON--->{
-                    "username": "Name"
-                    "password": "Password"
-                    "email": "E-mail"
+                        "username": "Name"
+                        "password": "Password"
+                        "email": "E-mail"
                     }
 
 #Dashboard_Start ---> https://jk50f5a0mi.execute-api.us-east-1.amazonaws.com/Dashboard/Dashboard_Start .
@@ -151,56 +151,61 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 
 #Setup_Plate ---> https://gisvleb85c.execute-api.us-east-1.amazonaws.com/Setup_Delete_plate/setup-plate .
     -Postman JSON--->{
-                    "user_id" : "2",
-                    "plate_id": 2,
-                    "plant_name": "Lavender",
-                    "plant_id": 1,
-                    "age_in_weeks": 3,
-                    "harvested": false
+                        "user_id" : "2",
+                        "plate_id": 2,
+                        "plant_name": "Lavender",
+                        "plant_id": 1,
+                        "age_in_weeks": 3,
+                        "harvested": false
                     }
 
 #Delete_Plate ---> https://gisvleb85c.execute-api.us-east-1.amazonaws.com/Setup_Delete_plate/delete-plate .
     -Postman JSON--->{
-                    "plate_name": "Plate 1",
-                    "user_id": "1"
+                        "plate_name": "Plate 1",
+                        "user_id": "1"
                     }
 
 
 #RPI_Data ---> https://wdy1m5yd7i.execute-api.us-east-1.amazonaws.com/RPI/RPI_DATA .
     -Postman JSON--->{
-                    "plate_id": 1,
-                    "plant_id": 2,
-                    "user_id": 2,
-                    "unit_id": 1,
-                    "timestamp": "2025-04-30 14:30:00",
-                    "temperature": 25.5,
-                    "humidity": 60.2,
-                    "light_intensity": 350.0,
-                    "solution_level": 5.5,
-                    "ph": 6.5,
-                    "ec": 1.2,
-                    "anomly_detection": 0,
-                    "red_light_intensity": 100.0,
-                    "blue_light_intensity": 80.0,
-                    "far_red_light_intensity": 60.0,
-                    "air_flow_level": 2.0,
-                    "CO2": 400.0
+                        "plate_id": 1,
+                        "plant_id": 2,
+                        "user_id": 2,
+                        "unit_id": 1,
+                        "timestamp": "2025-04-30 14:30:00",
+                        "temperature": 25.5,
+                        "humidity": 60.2,
+                        "light_intensity": 350.0,
+                        "solution_level": 5.5,
+                        "ph": 6.5,
+                        "ec": 1.2,
+                        "anomly_detection": 0,
+                        "red_light_intensity": 100.0,
+                        "blue_light_intensity": 80.0,
+                        "far_red_light_intensity": 60.0,
+                        "air_flow_level": 2.0,
+                        "CO2": 400.0
                     }
 
 
 #RL_Filter --->***___This will be created soon_____***
     -Postman JSON--->{
-                    "user_id": "12345"
+                        "user_id": "12345"
                     }
 
 
 #Get-desease-image ---> https://a4b272sa24.execute-api.us-east-1.amazonaws.com/disease_images/Get-disease-image .
-    -Postman JSON--->{It requiers nothing}
+    -Postman JSON--->{
+                        "user_id" : "1"
+                    }
+
 
 #Delete-desease-image ---> https://a4b272sa24.execute-api.us-east-1.amazonaws.com/disease_images/Delete-disease-image .
     -Postman JSON--->{
-                    "image_url": "https://prediction-resultss.s3.amazonaws.com/predictions/botrytis_predicted_1738860975.jpg "
+                        "image_url": "https://prediction-resultss.s3.us-east-1.amazonaws.com/predictions/botrytis_predicted_1746284582.jpg",
+                        "user_id": "1"
                     }
+
 
 #GetACTStatus ---> ***_____This will be created soon______***
     -Postman JSON--->***___This will be created soon___***
@@ -209,7 +214,10 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
     -Postman JSON--->***___This will be created soon___***
 
 #start-stop-EC2 ---> https://jk50f5a0mi.execute-api.us-east-1.amazonaws.com/Dashboard/Get-prediction .
-    -Postman JSON--->{It requiers nothing}
+    -Postman JSON--->{
+                        "user_id" : "1"
+                    }
+
 
 ----------------------------------------------------------------------------------------------------------------------------------
 #(This is overall about the steps of the AWS setup process the architecture of my project, and the common problems that I encountered during the development phase.
