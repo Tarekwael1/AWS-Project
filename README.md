@@ -131,6 +131,8 @@ In the future, I will make the cloudwatchlogs to run this operation like the pro
 #EC2_Prediction.py
     --->This is the script, which runs the prediction model on the EC2 instance, and save the result is the database.
 
+#Disease_Detection_Runner.py
+    --->This is the script, which runs the disease detection model on the EC2 instance, and save the images in the S3 bucket and RDS. Additionally, this model will be ran everyday at 6am and will sent a message to the user.
 ----------------------------------------------------------------------------------------------------------------------------------
 #APIs
 #rds-user-auth --->  https://zeucnmkeah.execute-api.us-east-1.amazonaws.com/RegisterLogin/rds-user-auth .

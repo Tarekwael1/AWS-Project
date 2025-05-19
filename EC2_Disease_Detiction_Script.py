@@ -10,7 +10,7 @@ logging.basicConfig(
     level=logging.DEBUG,  # Set logging level to DEBUG
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("model_processor.log"),  # Log to a file
+        logging.FileHandler("/tmp/model_processor.log"),  # Log to a writable file in /tmp
         logging.StreamHandler()  # Log to the console
     ]
 )
