@@ -75,6 +75,6 @@ def lambda_handler(event, context):
     except Exception as e:
         logging.error(f"Error in Lambda execution: {e}")
         return {
-            'statusCode': 500,
+            'statusCode': 500, 
             'body': json.dumps({'error': str(e)})
         }
