@@ -7,7 +7,7 @@ Additionally, I will provide detailed documentation on the setup process, code s
 
 #These are the main features of the project:
 #1-Mobile App.
-#2-Backend using AWS.
+#2-Backend using AWS. 
 #3- 4 to 5 models AI.
 #4- RL machine learning.
 ----------------------------------------------------------------------------------------------------------------------------------

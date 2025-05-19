@@ -14,7 +14,7 @@ logging.basicConfig(
         logging.StreamHandler()  # Log to the console
     ]
 )
-
+ 
 # Initialize Roboflow API
 rf = Roboflow(api_key="MHOwGJ6gNlwpudPBxOmc")
 project = rf.workspace().project("lavender-disease")
