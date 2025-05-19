@@ -32,7 +32,7 @@ db_config = {
     'cursorclass': pymysql.cursors.DictCursor  # Ensure the results are returned as a dictionary
 }
 
-def save_to_rds(disease_name, detection_id, s3_url):
+def save_to_rds(disease_name, detection_id, disease_uri):
     connection = None
     try:
         # Connect to the database
@@ -42,15 +42,15 @@ def save_to_rds(disease_name, detection_id, s3_url):
         
         # Insert data into the Disease_Detection_Results table
         query = """
-        INSERT INTO Disease_Detection_Results (disease_name, detection_id, s3_url)
+        INSERT INTO Disease_Detection_Results (disease_name, detection_id, disease_uri)
         VALUES (%s, %s, %s)
         """
-        cursor.execute(query, (disease_name, detection_id, s3_url))
-        logging.info(f"Executed query: {query} with values: {disease_name}, {detection_id}, {s3_url}")
+        cursor.execute(query, (disease_name, detection_id, disease_uri))
+        logging.info(f"Executed query: {query} with values: {disease_name}, {detection_id}, {disease_uri}")
         
         # Commit the transaction
         connection.commit()
-        logging.info(f"Data saved to RDS: {disease_name}, {detection_id}, {s3_url}")
+        logging.info(f"Data saved to RDS: {disease_name}, {detection_id}, {disease_uri}")
         
     except Exception as e:
         logging.error(f"Error saving to RDS: {e}")

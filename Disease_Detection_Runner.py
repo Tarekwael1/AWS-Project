@@ -1,80 +1,88 @@
 import boto3
-import json
 import time
+import pymysql
 import logging
 
-# AWS Region and EC2 instance details
-region = 'us-east-1'
-instances = ['i-0c0516d7f319e2d78']  # Replace with your EC2 instance ID
+ssm = boto3.client('ssm')
+sns = boto3.client('sns')
 
-# AWS clients
-ec2 = boto3.client('ec2', region_name=region)
-ssm_client = boto3.client('ssm', region_name=region)
+rds_host = "yarb-mndf3sh-aktar-mn-keda.cp8kcmwa2o3e.us-east-1.rds.amazonaws.com"
+username = "admin"
+password = "Admin123"
+db_name = "main_db"
+topic_arn = 'arn:aws:sns:us-east-1:116981773526:Notifications'  
 
 def lambda_handler(event, context):
+    instance_id = 'i-0c0516d7f319e2d78'
+    
     try:
-        logging.info("Starting disease detection Lambda execution...")
-
-        # Start EC2 instance if not running
-        instance_status = ec2.describe_instance_status(InstanceIds=instances)
-        if not instance_status['InstanceStatuses'] or instance_status['InstanceStatuses'][0]['InstanceState']['Name'] != 'running':
-            logging.info("EC2 instance is not running. Starting instance...")
-            ec2.start_instances(InstanceIds=instances)
-            logging.info(f"Started EC2 instance(s): {instances}")
-            logging.info("Waiting for EC2 instance to be fully running (about 60 seconds)...")
-            time.sleep(60)  # Wait for instance to start fully
-        else:
-            logging.info("EC2 instance is already running.")
-
-        # Command to run disease detection script on EC2 (adjust path if needed)
-        command = "sudo -u ubuntu /usr/bin/python3 /home/ubuntu/disease_detection_model.py"
-        logging.info(f"Sending command to EC2: {command}")
-
-        # Send command to EC2 instance via SSM
-        response = ssm_client.send_command(
-            InstanceIds=instances,
+        # 1. Run command on EC2 to start model
+        response = ssm.send_command(
+            InstanceIds=[instance_id],
             DocumentName='AWS-RunShellScript',
-            Parameters={'commands': [command]},
+            Parameters={'commands': ['sudo -u ubuntu /usr/bin/python3 /home/ubuntu/disease_detection_model.py']}
         )
         command_id = response['Command']['CommandId']
-        logging.info(f"Command sent. Command ID: {command_id}")
 
-        # Wait for command to complete, checking status every 10 seconds (max 10 attempts)
-        for attempt in range(10):
-            time.sleep(10)
-            output = ssm_client.get_command_invocation(
+        # 2. Poll command status
+        max_tries = 20
+        for i in range(max_tries):
+            time.sleep(3)
+            invocation = ssm.get_command_invocation(
                 CommandId=command_id,
-                InstanceId=instances[0],
+                InstanceId=instance_id
             )
-            status = output['Status']
-            logging.info(f"Attempt {attempt + 1}: Command status = {status}")
-            if status in ['Success', 'Failed', 'Cancelled', 'TimedOut']:
+            status = invocation['Status']
+            if status in ('Success', 'Failed', 'Cancelled', 'TimedOut'):
                 break
 
-        # Log outputs
-        stdout = output.get('StandardOutputContent', '')
-        stderr = output.get('StandardErrorContent', '')
-        logging.info(f"Command output: {stdout}")
-        if stderr:
-            logging.error(f"Command error output: {stderr}")
-
         if status != 'Success':
-            return {
-                'statusCode': 500,
-                'body': json.dumps({'error': f"Command execution failed with status: {status}", 'stderr': stderr})
-            }
+            sns.publish(
+                TopicArn=topic_arn,
+                Subject='EC2 Command Failed',
+                Message=f'EC2 model command failed with status: {status}'
+            )
+            return {'statusCode': 500, 'body': 'EC2 command failed'}
 
-        # Optionally, you can fetch results from RDS here if needed
-        # (Add your RDS query logic if you want to return detection results)
+        # 3. EC2 command succeeded - now fetch results from RDS
+        connection = pymysql.connect(
+            host=rds_host,
+            user=username,
+            password=password,
+            database=db_name,
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT DISTINCT disease_name FROM Disease_Detection_Results ORDER BY disease_name ASC")
+                results = cursor.fetchall()
 
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'message': 'Disease detection model run successfully', 'output': stdout})
-        }
+        if not results:
+            sns.publish(
+                TopicArn=topic_arn,
+                Subject='No Prediction Result',
+                Message='No prediction result found in RDS after model run.'
+            )
+            return {'statusCode': 404, 'body': 'No prediction result found'}
+
+        # Compose message from distinct disease names
+        disease_names = [row['disease_name'] for row in results]
+        message = "Prediction results:\n" + "\n".join(disease_names)
+
+        # 4. Send SNS notification with results
+        sns.publish(
+            TopicArn=topic_arn,
+            Subject='New Disease Prediction Result',
+            Message=message
+        )
+
+        return {'statusCode': 200, 'body': 'Success'}
 
     except Exception as e:
-        logging.error(f"Error in Lambda execution: {e}")
-        return {
-            'statusCode': 500, 
-            'body': json.dumps({'error': str(e)})
-        }
+        logging.error(f"Error in Lambda: {e}")
+        sns.publish(
+            TopicArn=topic_arn,
+            Subject='Disease Detection Lambda Error',
+            Message=str(e)
+        )
+        return {'statusCode': 500, 'body': 'Error'}
