@@ -8,8 +8,13 @@ Additionally, I will provide detailed documentation on the setup process, code s
 #These are the main features of the project:
 #1-Mobile App.
 #2-Backend using AWS. 
-#3- 4 to 5 models AI.
+#3- 3 models AI.
 #4- RL machine learning.
+
+
+
+
+
 ----------------------------------------------------------------------------------------------------------------------------------
 #Looking especially at the backend of the mobile application, which AWS handles:
 #Generally speaking, I used AWS Lambda for serverless functions and API Gateway for managing API requests.RDS is used for relational database management, and S3 is used for the storage of static files.  Additionally, I implemented IAM roles for secure access control and monitoring through CloudWatch to track performance and errors. EC2 to run the AI models. Furthermore, I will use AWS Glue for ETL (Extract, Transform, Load) processes, allowing for efficient data integration and preparation for the RL model. Finally, I will utilize CloudFormation for infrastructure as code, ensuring that my deployment is reproducible and manageable.
