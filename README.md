@@ -7,7 +7,6 @@ Additionally, I will provide detailed documentation on the setup process, code s
 #2- Do a Practical application about the fields that we study.
 
 #These are the main features of the project:
-<<<<<<<<< Temporary merge branch 1
 #1- Mobile App.
 #2- Backend using AWS. 
 #3- 3 models AI.
