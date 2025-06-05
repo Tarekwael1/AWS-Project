@@ -1,3 +1,5 @@
+The componets of the AWS project:
+
 * IAM.
 * NAT Gateway.
 * Security Groups.
@@ -46,11 +48,9 @@
   11. RPI_Data.py: This function needs the permissions of connected with RDS to write data.
       * AmazonRDSWriteOnlyAccess.
 
-
 # RDS
 
 This is the storage database for the whole system, and we connected with it to a local server, like Mysql server to make the work easier.
-
 
 # Nat Gateway
 
@@ -127,7 +127,6 @@ This is the computing service which we used to run the light models, such as pre
 
 It contains the whole requirements, such as pandas...etc.
 
-
 # S3
 
 Our S3 has more than bucket, and each one for spicific mission.
@@ -137,37 +136,21 @@ Our S3 has more than bucket, and each one for spicific mission.
 3. Bucket for filtered data as file.csv.
 4. Another bucket for the output of the sagemaker, which is the trained model.
 
-
-
 # Sagemaker
 
 We use it to train our models, and it requires many libraies, like sklearn...etc.
-
-
-
-
 
 # AWS Glue
 
 This service takes the data of RL model and analyses it, then save it into the S3.
 
-
-
-
-
-
-
 # SNS
 
 We use it to send notification to the users as an alert for quintessential things, like the outputs of the models. In addition, the nitifications are sent via Email or HTTPS to the mobile app.
 
-
-
-
 # Cloudwatch Events
 
 Is used to run the disease detection model every day morning, and send the output as a meesage.
-
 
 # APIs
 
