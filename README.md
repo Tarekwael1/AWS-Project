@@ -1,4 +1,4 @@
-The componets of the AWS project:
+The components of the AWS project:
 
 * IAM.
 * NAT Gateway.
@@ -11,58 +11,58 @@ The componets of the AWS project:
 * Sagemaker.
 * AWS Glue.
 * SNS.
-* Cloudwatch Events.
+* CloudWatch Events.
 * RDS.
 
 ![Design](https://github.com/user-attachments/assets/90899ed7-17b8-4163-82cd-f7c4e64e5e33)
 
 # IAM Roles:
 
-* Give the Lambda functions permissions to connect with other services and complete their missions correctly.
-  1. Lambda_login.py: This function needs the permission of connected with RDS to read the data only.
+* Give the other services functions permissions to connect with other services and complete their missions correctly.
+  1. Lambda_login.py: This function requires permission to connect to RDS to read the data only.
      * AmazonRDSReadOnlyAccess.
-  2. Lambda_Registeration.py: This function needs the permission of connected with RDS to write the data only.
+  2. Lambda_Registeration.py: This function requires permission to connect with RDS to write the data only.
      * AmazonRDSWriteOnlyAccess.
-  3. Dashboard_start.py: This function needs the permission of connected with RDS to read data only.
+  3. Dashboard_start.py: This function requires permission to connect to RDS to read data only.
      * AmazonRDSReadOnlyAccess.
-  4. Setup_plate.py: This function needs the permission of connected with RDS to write new data only.
+  4. Setup_plate.py: This function orders permission to connect with RDS to write new data only.
      * AmazonRDSWriteOnlyAccess.
-  5. Delete_plate.py: This function needs the permission of connected with RDS to write data only.
+  5. Delete_plate.py: This function orders permission to connect with RDS to write data only.
      * AmazonRDSWriteOnlyAccess.
-  6. Start_Stop_EC2.py: This function needs the permissions of connected with RDS and EC2, and SNS permissions.
+  6. Start_Stop_EC2.py: This function asks permissions to connect with RDS and EC2, and SNS permissions.
      * AmazonSNSFullAccess.
      * AmazonRDSWriteOnlyAccess.
      * AmazonSSMFullAccess.
-  7. Disease_detection_Runner.py: This function needs the permissions of connected with RDS and EC2, and SNS permissions.
+  7. Disease_detection_Runner.py: This function asks permissions to connect to RDS and EC2, and SNS permissions.
      * AmazonSNSFullAccess.
      * AmazonRDSWriteOnlyAccess.
      * AmazonSSMFullAccess.
-  8. Get_disease_Images.py: This function needs the permissions of connected with RDS to read data.
+  8. Get_disease_Images.py: This function calls permissions to connect with RDS to read data.
      * AmazonRDSReadOnlyAccess.
-  9. Delete_disease_Images.py: This function needs the permissions of connected with RDS to read and write, and permissions of S3.
+  9. Delete_disease_Images.py: This function calls permissions to connect with RDS to read and write, and permissions for S3.
      * AmazonS3FullAccess.
      * AmazonRDSFullAccess.
-  10. RL_Data_Filter.py: This function needs the permissions of connected with RDS to read and write, and permissions of S3.
+  10. RL_Data_Filter.py: This function needs the permissions to connect to RDS to read and write, and permissions for S3.
       * AmazonS3FullAccess.
       * AmazonRDSFullAccess.
-  11. RPI_Data.py: This function needs the permissions of connected with RDS to write data.
+  11. RPI_Data.py: This function needs the permissions of connected to RDS to write data.
       * AmazonRDSWriteOnlyAccess.
 
 # RDS
 
-This is the storage database for the whole system, and we connected with it to a local server, like Mysql server to make the work easier.
+This is the storage database for the whole system, and we connected it to a local server, like a MySQL server, to make the work easier.
 
-# Nat Gateway
+# NAT Gateway
 
-This service make the connection with the Internet easy for private subnets, so we used it to give the private subnets the access to the internet.
+This service makes the connection with the Internet easy for private subnets, so we used it to give the private subnets access to the Internet.
 
-*To notice: Any Nat Gateway requires Elastic IP.
+*To notice: Any NAT Gateway requires an Elastic IP.
 
 # Security Groups
 
-The gard of the VPC, which check the whole communications to and from the VPC via the IP.
+The guard of the VPC, which checks the whole communications to and from the VPC via the IP.
 
-1. RDS: Needs the connection with Lambda, EC2, and local server.
+1. RDS: Needs the connection with Lambda, EC2, and the local server.
 
    * Inbound:
      * MYSQL/Aurora   TCP     3306    from the security group of the Lambda, EC2, or your local IP.
@@ -71,7 +71,7 @@ The gard of the VPC, which check the whole communications to and from the VPC vi
    * Inbound:
      * <br/>SSH   TCP   22   from the security group of the Lambda and our local IP, if you need to connect with it from your local machine.
    * Outbound:
-     * MYSQL/Aurora   TCP     3306     to your local IP, if you created with RDS locally.
+     * MYSQL/Aurora   TCP     3306     to your local IP, if you created it locally with RDS.
 3. Lambda:
 
    * Outbound:
@@ -82,75 +82,75 @@ The gard of the VPC, which check the whole communications to and from the VPC vi
 
 The route table that automatically comes with your VPC. It controls the routing for all subnets that are not explicitly associated with any other route table.This service
 
-It contains private subnet, and used Nat Gateway to have an access to the internet.
+It contains a private subnet and uses a NAT Gateway to have access to the internet.
 
 # API
 
-This which sends and receives the commands from and to mobile APP, and triggers the Lambda funcions.
+This sends and receives the commands from and to the mobile APP, and triggers the Lambda functions.
 
-Each Lambda funtion has an API to make the communication more stable and faster without any interruptions.
+Each Lambda function has an API to make the communication more stable and faster without any interruptions.
 
 # Lambda
 
-* In Log in/ Register folder there are two scripts:
+* In the Log in/ Register folder, there are two scripts:
   1. Lambda_Login.py:
-     * This function is triggered by API, and receives the input data from the mobile app. Moreover, it will connect with the RDS to check if the data is correct. However, if the input data is correct that will return the confirmation message successfully, if not, that will answer with error message.
+     * This function is triggered by API and receives the input data from the mobile app. Moreover, it will connect with the RDS to check if the data is correct. However, if the input data is correct that will return the confirmation message successfully; if not, that will answer with an error message.
   2. lambda Registeration.py:
-     * This function is triggered by API, and recieves the input data from the mobile app, and save it into the RDS tables. However, it checks first if the data was inputted before or not.
-* In Dashboard folder there are three scripts:
+     * This function is triggered by the API, receives the input data from the mobile app, and saves it into the RDS tables. However, it checks first if the data was inputted before or not.
+* In the Dashboard folder, there are three scripts:
   1. Dashboard_start.py:
-     * Once the page of dashborad in the mobile app is oped, this Lambda will be triggered via API, and this function return the data from RDS of the plates to displayed in the app.
+     * Once the page of the dashboard in the mobile app is opened, this Lambda will be triggered via API, and this function returns the data from RDS of the plates to be displayed in the app.
   2. Setup_plate.py:
-     * This function will be triggerd via API when the user click on the add plate buttom. Moreover, it will take the input data and save it into RDS tables wich Dashboard start display it.
+     * This function will be triggered via API when the user clicks on the add plate button. Moreover, it will take the input data and save it into RDS tables, which Dashboard starts displaying.
   3. Delete_plate.py:
-     * This function will be triggerd via API when the user click on the delete plate buttom.
-* Display-Delete disease images folder include two files:
+     * This function will be triggered via API when the user clicks on the delete plate button.
+* Display-Delete disease images folder includes two files:
   1. Get_disease_images.py:
-     * This function just gets links of the images and the diseases' names from the RDS.
+     * This function just gets links to the images and the diseases' names from the RDS.
   2. Delete_disease_Images.py:
-     * This Lambda will receive image link to delete from RDS and S3.
-* Data folder contains two scripts:
+     * This Lambda will receive the image link to delete from RDS and S3.
+* The data folder contains two scripts:
   1. RPI_Data.py:
-     * This file receive the data from raspberry pi and save it into the RDS.
+     * This file receives the data from the Raspberry Pi and saves it into the RDS.
   2. RL_Data_Filter.py:
      * This function returns the filtered data, which is filtered using AWS Glue, and will be sent to the RL model.
        This script for the Lambda function, which chooses the required data for the RL model, such as(PH, Rh, Light, etc). This function filters data and then saves it as a file. CSV into an S3 bucket as a source file for the ETL. The ETL continues filtration, like if the RL needs the value, for example, the PH is equal to 20 and RH 3, the output will be another file. CSV, which will be saved in another folder in the S3 bucket.
-* In EC2 models runners folder there are two files:
+* In the EC2 models runners folder, there are two files:
   1. Start_Stop_EC2.py:
      * This function will be triggered via API when the setup plate page is opened, and it will run the Ec2 if it stoped, after that will run the EC2_script_prediction.py, which is on EC2 scrips folder, and the script itself runs the model and saves the output data into the RDS, and the Lambda function returns the output from the RDS.
   2. Disease_Detection_Runner.py:
-     * This Lambda is triggered by cloudwatch events service every day at 9 AM, and send notification with the output diseases' names. However, this function will run the EC2_Disease_Detection_Script.py, which is on EC2 scrips folder, and this script itself runs the model and save the output into the RDS, and the Lambd function returns it.
+     * This Lambda is triggered by the CloudWatch Events service every day at 9 AM, and sends a notification with the names of diseases. However, this function will run the EC2_Disease_Detection_Script.py, which is in the EC2 scripts folder, and this script itself runs the model and saves the output into the RDS, and the Lambda function returns it.
 
 # EC2
 
-This is the computing service which we used to run the light models, such as prediction and disease detection.
+This is the computing service that we used to run the light models, such as prediction and disease detection.
 
-It contains the whole requirements, such as pandas...etc.
+It contains all the requirements, such as pandas, etc.
 
 # S3
 
-Our S3 has more than bucket, and each one for spicific mission.
+Our S3 has more than one bucket, and each one fis or spicific mission.
 
-1. Bucket for the camera images, which the model detects them.
-2. Bucket for the detected disease, which is the output of the disease detection model.
+1. A bucket for the camera images, which the model detects.
+2. A bucket for the detected disease, which is the output of the disease detection model.
 3. Bucket for filtered data as file.csv.
 4. Another bucket for the output of the sagemaker, which is the trained model.
 
 # Sagemaker
 
-We use it to train our models, and it requires many libraies, like sklearn...etc.
+We use it to train our models, and it requires many libraries, like sklearn...etc.
 
 # AWS Glue
 
-This service takes the data of RL model and analyses it, then save it into the S3.
+This service takes the data of the RL model and analyses it, then saves it into the S3.
 
 # SNS
 
-We use it to send notification to the users as an alert for quintessential things, like the outputs of the models. In addition, the nitifications are sent via Email or HTTPS to the mobile app.
+We use it to send notifications to the users as an alert for quintessential things, like the outputs of the models. In addition, the notifications are sent via Email or HTTPS to the mobile app.
 
 # Cloudwatch Events
 
-Is used to run the disease detection model every day morning, and send the output as a meesage.
+It is used to run the disease detection model every morning and send the output as a message.
 
 # APIs
 
